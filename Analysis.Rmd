@@ -1,0 +1,172 @@
+# Analysis
+
+```{r}
+library(tidyverse)
+library(glue)
+```
+
+```{r}
+loans <- read_csv("data/neppp.csv")
+```
+
+```{r}
+loans %>% group_by(City) %>% tally(sort=TRUE)
+```
+
+```{r}
+context1 <- "Statewide, Omaha had the most loans at 1,598, which represented 38 percent of all loans given to Nebraska businesses. Lincoln (672), Grand Island, (147), Kearney (116) and Norfolk (89) rounded out the top 5."
+```
+
+```{r}
+loans %>% group_by(LoanRange) %>% tally()
+```
+
+```{r}
+context2 <- "The Small Business Administation did not report the exact amount each business took out in loans, offering a range that the loan fell into. Only loans of $150,000 or more were reported.\n\nOf the 4,179 loans, 2,394 of them were for the lowest range, $150,000 to $350,000. Statewide, 36 businesses got loans of $5 million to $10 million."
+```
+
+```{r}
+loans %>% filter(LoanRange == "a $5-10 million")
+```
+
+```{r}
+context3 <- "Among those top loan amount receipients are variety of businesses, mostly based in eastern Nebraska. Several are medical companies, such as the Kearney Regional Medical Center and the Nebraska Orthopaedic Hospital in Omaha. Rotella's Italian Bakery claimed to have retained 466 jobs with their upper range loan. Several agriculture industry businesses also topped the list."
+```
+
+```{r}
+loans %>% filter(JobsRetained >= 500)
+```
+
+```{r}
+context4 <- "Sixteen business reported retaining 500 jobs with their loans, the highest amount disclosed by federal regulators."
+```
+
+```{r}
+loans %>% summarize(avg = mean(JobsRetained, na.rm=TRUE))
+
+loans %>% group_by(JobsRetained) %>% tally()
+```
+
+```{r}
+context5 <- "The average number of jobs preserved by companies who reported that number is 51. However, 106 Nebraska companies said they retained zero workers with the loan. Another 644 left the question blank on their application."
+```
+
+
+
+Going to make a lede out of how many loans come from a specific city. 
+
+First need an AP style function.
+
+```{r}
+apstylenumber <- function(x){
+  if (x == 1) {
+  num <- "one"
+} else if (x == 2) {
+  num <- "two"
+} else if (x == 3) {
+  num <- "three"
+} else if (x == 4) {
+  num <- "four"
+} else if (x == 5) {
+  num <- "five"
+} else if (x == 6) {
+  num <- "six"
+} else if (x == 7) {
+  num <- "seven"
+} else if (x == 8) {
+  num <- "eight"
+} else if (x == 9) {
+  num <- "nine"
+} else {
+  num <- as.character(x)
+}
+  return(num)
+}
+```
+
+```{r}
+apstylenumber(22)
+```
+
+
+```{r}
+cities <- loans %>% 
+  mutate(ProperCity = str_to_title(City)) %>% 
+  group_by(City, ProperCity) %>% 
+  summarize(
+    Loans = n(), 
+    Jobs = sum(JobsRetained, na.rm=TRUE), 
+    blanks = sum(sum(is.na(JobsRetained)))) %>% 
+  rowwise() %>% 
+  mutate(
+    APLoans = apstylenumber(Loans), 
+    APJobs = apstylenumber(Jobs)
+    )
+```
+```{r}
+cities <- cities %>% mutate(
+    Headlineplural = case_when(
+      Jobs < 2 ~ "business",
+      Jobs > 1 ~ "businesses"
+    ),
+    Localclauseverb = case_when(
+      Jobs < 2 ~ "is",
+      Jobs > 1 ~ "are"
+    ),
+    Blankclause = case_when(
+      blanks == 0 ~ "",
+      blanks > 0 ~ paste("However, ", apstylenumber(blanks), " did not report information about jobs preserved with the loan.", sep="")
+    )
+)
+```
+
+```{r}
+cities <- cities %>% mutate(
+  NoDataClause = case_when(
+      Jobs < 1 & blanks > 0 ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs preserved.", sep=""), 
+      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and those businesses claimed in their loan paperwork to have preserved ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
+)
+)
+```
+
+
+```{r}
+loans %>% mutate(cleanLoanRange = gsub("[abcde] ", "", LoanRange))
+```
+
+
+```{r}
+storyMaker <- function(city){
+  ci <- cities %>% filter(City == city)
+  top <- ci %>% glue_data(
+  'SBA: {Loans} {ProperCity} {Headlineplural} got pandemic loans\n\nThe Small Business Administration on Monday released some details about 4,179 Nebraska businesses that took out Paycheck Protection Program loans of $150,000 or more.\n\n{NoDataClause}\n\n{context1}\n\n{context2}\n\n{context3}\n\n{context4}\n\n{context5}\n\n{ProperCity} loans reported by the SBA on Monday: ')
+  bizlist <- loans %>% filter(City == city) %>% mutate(cleanLoanRange = gsub("[abcde] ", "", LoanRange)) %>% arrange(BusinessName)
+  listgraph <- bizlist %>% glue_data('{BusinessName}, {cleanLoanRange}. ')
+  filename <- paste("stories/", city, ".txt", sep="")
+  writeLines(c(top, listgraph), filename)
+}
+```
+
+```{r}
+map(cities$City, ~storyMaker(.))
+```
+
+
+
+```{r}
+makeStory <- function(cnty){
+  x <- stories %>% filter(County == cnty)
+  headline <- paste(x$Percent, " percent of ", x$County, " County workers have claimed unemployment during pandemic", sep="")
+  filename <- paste("stories/", cnty, ".txt", sep="")
+  writeLines(c(headline,"\n\n", x$story), filename)
+}
+```
+
+
+
+```{r}
+first <-  
+
+
+```
+

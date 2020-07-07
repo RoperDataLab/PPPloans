@@ -1,0 +1,15 @@
+# Data cleanup
+
+This won't take much. The data is pretty simple. Just going to import it, filter out Nebraska and export it to the working data folder.
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+loans <- read_csv("foia_150k_plus.csv")
+```
+```{r}
+loans %>% filter(State == "NE") %>% mutate(City = gsub("/NE", "", City)) %>% write_csv("../data/neppp.csv")
+```
+
