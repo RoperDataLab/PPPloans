@@ -14,6 +14,12 @@ loans %>% group_by(City) %>% tally(sort=TRUE)
 ```
 
 ```{r}
+context0 <- "The data released by the Small Business Adminstration on Monday is only a small slice of all Paycheck Protection loans issued during the pandemic. The government revealed details of 650,000 loans on Monday. In all, more than 5 million loans were granted under the program\n\nThe loans are low-interest loans that can be forgiven if the company uses the money to retain employees. Companies are just now beginning the loan forgiveness process."
+```
+
+
+
+```{r}
 context1 <- "Statewide, Omaha had the most loans at 1,598, which represented 38 percent of all loans given to Nebraska businesses. Lincoln (672), Grand Island, (147), Kearney (116) and Norfolk (89) rounded out the top 5."
 ```
 
@@ -38,7 +44,7 @@ loans %>% filter(JobsRetained >= 500)
 ```
 
 ```{r}
-context4 <- "Sixteen business reported retaining 500 jobs with their loans, the highest amount disclosed by federal regulators."
+context4 <- "Sixteen business reported that they would retain 500 jobs with their loans, the highest amount disclosed by federal regulators."
 ```
 
 ```{r}
@@ -123,8 +129,8 @@ cities <- cities %>% mutate(
 ```{r}
 cities <- cities %>% mutate(
   NoDataClause = case_when(
-      Jobs < 1 & blanks > 0 ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs preserved.", sep=""), 
-      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and those businesses claimed in their loan paperwork to have preserved ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
+      Jobs < 1 & blanks > 0 ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs they expected to preserve.", sep=""), 
+      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and those businesses claimed in their loan paperwork they would preserve ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
 )
 )
 ```
@@ -139,7 +145,7 @@ loans %>% mutate(cleanLoanRange = gsub("[abcde] ", "", LoanRange))
 storyMaker <- function(city){
   ci <- cities %>% filter(City == city)
   top <- ci %>% glue_data(
-  'SBA: {Loans} {ProperCity} {Headlineplural} got pandemic loans\n\nThe Small Business Administration on Monday released some details about 4,179 Nebraska businesses that took out Paycheck Protection Program loans of $150,000 or more.\n\n{NoDataClause}\n\n{context1}\n\n{context2}\n\n{context3}\n\n{context4}\n\n{context5}\n\n{ProperCity} loans reported by the SBA on Monday: ')
+  'SBA: {Loans} {ProperCity} {Headlineplural} got pandemic loans\n\nThe Small Business Administration on Monday released some details about 4,179 Nebraska businesses that took out Paycheck Protection Program loans of $150,000 or more.\n\n{NoDataClause}\n\n{context0}\n\n{context1}\n\n{context2}\n\n{context3}\n\n{context4}\n\n{context5}\n\n{ProperCity} loans reported by the SBA on Monday: ')
   bizlist <- loans %>% filter(City == city) %>% mutate(cleanLoanRange = gsub("[abcde] ", "", LoanRange)) %>% arrange(BusinessName)
   listgraph <- bizlist %>% glue_data('{BusinessName}, {cleanLoanRange}. ')
   filename <- paste("stories/", city, ".txt", sep="")
