@@ -1,8 +1,8 @@
-SBA: 672 Lincoln businesses got pandemic loans
+SBA: 673 Lincoln businesses got pandemic loans
 
 The Small Business Administration on Monday released some details about 4,179 Nebraska businesses that took out Paycheck Protection Program loans of $150,000 or more.
 
-Of them, 672 are from Lincoln and the businesses planned in their loan paperwork to preserve 35,991 jobs with that money. However, 35 did not report information about jobs preserved with the loan.
+Of them, 673 are from Lincoln and the businesses planned in their loan paperwork to preserve 36,342 jobs with that money. However, 35 did not report information about jobs preserved with the loan.
 
 The data released by the Small Business Administration on Monday is only a small slice of all Paycheck Protection loans issued during the pandemic. The government revealed details of 650,000 loans on Monday. In all, more than 5 million loans were granted under the program.
 
@@ -619,6 +619,7 @@ SURGICAL ASSOCIATES, PC, $350,000-1 million.
 SUTTON SKIN & EYE CLINIC PC, $350,000-1 million. 
 SWEAT ETHIC, LLC, $150,000-350,000. 
 T.O. HAAS, LLC, $1-2 million. 
+TA DET INC, $150,000-350,000. 
 TALENT PLUS INC., $1-2 million. 
 TDP PHASE TWO, $150,000-350,000. 
 TEAMMATES MENTORING PROGRAM, $350,000-1 million. 

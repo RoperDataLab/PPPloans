@@ -10,6 +10,12 @@ library(tidyverse)
 loans <- read_csv("foia_150k_plus.csv")
 ```
 ```{r}
-loans %>% filter(State == "NE") %>% mutate(City = gsub("/NE", "", City)) %>% write_csv("../data/neppp.csv")
+loans %>% filter(State == "NE") %>% group_by(City) %>% tally()
+```
+
+
+
+```{r}
+loans %>% filter(State == "NE") %>% mutate(City = gsub("/NE", "", City)) %>% mutate(City = gsub("LINCOLN,", "LINCOLN", City)) %>% mutate(City = gsub("MCCOOK,", "MC COOK", City)) %>% write_csv("../data/neppp.csv")
 ```
 
