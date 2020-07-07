@@ -14,7 +14,7 @@ loans %>% group_by(City) %>% tally(sort=TRUE)
 ```
 
 ```{r}
-context0 <- "The data released by the Small Business Adminstration on Monday is only a small slice of all Paycheck Protection loans issued during the pandemic. The government revealed details of 650,000 loans on Monday. In all, more than 5 million loans were granted under the program\n\nThe loans are low-interest loans that can be forgiven if the company uses the money to retain employees. Companies are just now beginning the loan forgiveness process."
+context0 <- "The data released by the Small Business Administration on Monday is only a small slice of all Paycheck Protection loans issued during the pandemic. The government revealed details of 650,000 loans on Monday. In all, more than 5 million loans were granted under the program.\n\nThe loans are low-interest loans that can be forgiven if the company uses the money to retain employees. Companies are just now beginning the loan forgiveness process."
 ```
 
 
@@ -28,7 +28,7 @@ loans %>% group_by(LoanRange) %>% tally()
 ```
 
 ```{r}
-context2 <- "The Small Business Administation did not report the exact amount each business took out in loans, offering a range that the loan fell into. Only loans of $150,000 or more were reported.\n\nOf the 4,179 loans, 2,394 of them were for the lowest range, $150,000 to $350,000. Statewide, 36 businesses got loans of $5 million to $10 million."
+context2 <- "The Small Business Administration did not report the exact amount each business took out in loans, offering a range that the loan fell into. Only loans of $150,000 or more were reported.\n\nOf the 4,179 loans, 2,394 of them were for the lowest range, $150,000 to $350,000. Statewide, 36 businesses got loans of $5 million to $10 million."
 ```
 
 ```{r}
@@ -36,7 +36,7 @@ loans %>% filter(LoanRange == "a $5-10 million")
 ```
 
 ```{r}
-context3 <- "Among those top loan amount receipients are variety of businesses, mostly based in eastern Nebraska. Several are medical companies, such as the Kearney Regional Medical Center and the Nebraska Orthopaedic Hospital in Omaha. Rotella's Italian Bakery claimed to have retained 466 jobs with their upper range loan. Several agriculture industry businesses also topped the list."
+context3 <- "Among those top loan amount recipients are variety of businesses, mostly based in eastern Nebraska. Several are medical companies, such as the Kearney Regional Medical Center and the Nebraska Orthopaedic Hospital in Omaha. Rotella's Italian Bakery claimed to have retained 466 jobs with their upper range loan. Several agriculture industry businesses also topped the list."
 ```
 
 ```{r}
@@ -84,7 +84,7 @@ apstylenumber <- function(x){
 } else if (x == 9) {
   num <- "nine"
 } else {
-  num <- as.character(x)
+  num <- as.character(format(x, nsmall=0, big.mark=","))
 }
   return(num)
 }
@@ -112,12 +112,12 @@ cities <- loans %>%
 ```{r}
 cities <- cities %>% mutate(
     Headlineplural = case_when(
-      Jobs < 2 ~ "business",
-      Jobs > 1 ~ "businesses"
+      Loans < 2 ~ "business",
+      Loans > 1 ~ "businesses"
     ),
     Localclauseverb = case_when(
-      Jobs < 2 ~ "is",
-      Jobs > 1 ~ "are"
+      Loans < 2 ~ "is",
+      Loans > 1 ~ "are"
     ),
     Blankclause = case_when(
       blanks == 0 ~ "",
@@ -129,8 +129,8 @@ cities <- cities %>% mutate(
 ```{r}
 cities <- cities %>% mutate(
   NoDataClause = case_when(
-      Jobs < 1 & blanks > 0 ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs they expected to preserve.", sep=""), 
-      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and those businesses claimed in their loan paperwork they would preserve ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
+      Jobs == blanks ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs they expected to preserve.", sep=""), 
+      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and they claimed in their loan paperwork they would preserve ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
 )
 )
 ```
