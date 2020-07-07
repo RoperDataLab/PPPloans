@@ -1,67 +1,94 @@
 # Analysis
 
+This document is impossible to explain in a linear fashion. It is the result of a repetitively iterative process of attempting to write a paragraph with code, then needing new code to generate a new paragraph, and the order of things becomes difficult to explain.
+
+But it's an example of how data journalists write paragraphs of stories out of analysis, combined with an example of how to create locally relevant versions of a story on a wide scale. 
+
+First we'll load the tidyverse and glue, which is part of the tidyverse, which helps write text with templating. We'll use it and paste where each is advantageous. 
+
 ```{r}
 library(tidyverse)
 library(glue)
 ```
 
+Loading Nebraska data which is cleaned and created in the DataWork notebook in the `data-raw` folder.
+
 ```{r}
 loans <- read_csv("data/neppp.csv")
 ```
 
-```{r}
-loans %>% group_by(City) %>% tally(sort=TRUE)
-```
+A story like this, you want a lead that gives people a local view of things. That lead will get written with glue, which means it's going to come later. It'll say something to the effect of SBA releases loan data and X are from Y town. 
+
+After that locally relevant top, we'll need some statewide context. First, we'll need some context about the loans saved to a variable.
 
 ```{r}
 context0 <- "The data released by the Small Business Administration on Monday is only a small slice of all Paycheck Protection loans issued during the pandemic. The government revealed details of 650,000 loans on Monday. In all, more than 5 million loans were granted under the program.\n\nThe loans are low-interest loans that can be forgiven if the company uses the money to retain employees. Companies are just now beginning the loan forgiveness process."
 ```
 
+I'm envisioning a series of paragraphs that give some top level analysis. Like, say, where were the most loans issued. 
 
+```{r}
+loans %>% group_by(City) %>% tally(sort=TRUE)
+```
+
+Now we can create a context paragraph out of this, and save it to a variable for use later.
 
 ```{r}
 context1 <- "Statewide, Omaha had the most loans at 1,598, which represented 38 percent of all loans given to Nebraska businesses. Lincoln (672), Grand Island, (147), Kearney (116) and Norfolk (89) rounded out the top 5."
 ```
 
+How about loans by the loan range? 
+
 ```{r}
 loans %>% group_by(LoanRange) %>% tally()
 ```
+
+Another context graph.
 
 ```{r}
 context2 <- "The Small Business Administration did not report the exact amount each business took out in loans, offering a range that the loan fell into. Only loans of $150,000 or more were reported.\n\nOf the 4,179 loans, 2,394 of them were for the lowest range, $150,000 to $350,000. Statewide, 36 businesses got loans of $5 million to $10 million."
 ```
 
+What about those companies that get the most money? 
+
 ```{r}
 loans %>% filter(LoanRange == "a $5-10 million")
 ```
+
+More context.
 
 ```{r}
 context3 <- "Among those top loan amount recipients are variety of businesses, mostly based in eastern Nebraska. Several are medical companies, such as the Kearney Regional Medical Center and the Nebraska Orthopaedic Hospital in Omaha. Rotella's Italian Bakery claimed to have retained 466 jobs with their upper range loan. Several agriculture industry businesses also topped the list."
 ```
 
+What about big job preservations? 
+
 ```{r}
 loans %>% filter(JobsRetained >= 500)
 ```
 
+Another context graph.
+
 ```{r}
 context4 <- "Sixteen business reported that they would retain 500 jobs with their loans, the highest amount disclosed by federal regulators."
 ```
+
+How about some averages, with some context.
 
 ```{r}
 loans %>% summarize(avg = mean(JobsRetained, na.rm=TRUE))
 
 loans %>% group_by(JobsRetained) %>% tally()
 ```
+A six context graph (note: context0 came after I'd done 1-5 and I wanted to fit it in some order). 
 
 ```{r}
 context5 <- "The average number of jobs preserved by companies who reported that number is 51. However, 106 Nebraska companies said they retained zero workers with the loan. Another 644 left the question blank on their application."
 ```
 
-
-
 Going to make a lede out of how many loans come from a specific city. 
 
-First need an AP style function.
+First need an AP style function for small towns with one, two, three loans instead of 1, 2, 3 loans. 
 
 ```{r}
 apstylenumber <- function(x){
@@ -90,10 +117,13 @@ apstylenumber <- function(x){
 }
 ```
 
+Testing it.
+
 ```{r}
 apstylenumber(22)
 ```
 
+Now I'm going to create a table that has the bits and pieces I need to make my story. The first chunk here is going to fix the capitalization of city names, group by those cities, create some numbers for those cities, then convert them into AP style.
 
 ```{r}
 cities <- loans %>% 
@@ -109,6 +139,9 @@ cities <- loans %>%
     APJobs = apstylenumber(Jobs)
     )
 ```
+
+After doing this, I starte to try and write with a template and learned quickly that I needed to work with pluralization of some words. Also, some businesses left the jobs retained field blank -- it's NA in the data -- so I wanted to note that with a contextual sentence. 
+
 ```{r}
 cities <- cities %>% mutate(
     Headlineplural = case_when(
@@ -126,6 +159,8 @@ cities <- cities %>% mutate(
 )
 ```
 
+Later, after some more iteration, it became clear I needed to handle some cases where a town had a single business that didn't provide information versus places with businesses who did. 
+
 ```{r}
 cities <- cities %>% mutate(
   NoDataClause = case_when(
@@ -135,11 +170,13 @@ cities <- cities %>% mutate(
 )
 ```
 
+Then, my plan at the end of the story was to include a list for each town of businesses that got PPP loans. I struggled with how to do this, but ultimately just made it an alphabetical list followed by the size of loan each company got. So first thing I needed to do was strip out some cruft from the LoanRange field.  
 
 ```{r}
 loans %>% mutate(cleanLoanRange = gsub("[abcde] ", "", LoanRange))
 ```
 
+Now I'm ready to make a function called a storyMaker. It accepts a city name from a dataframe, then filters the data for that city, creates a headline, a lead and a second paragraph from that city data. Then, we add the six context graphs created, then the list of companies at the end. At the end of the function, it writes out a text file to a `stories` folder.
 
 ```{r}
 storyMaker <- function(city){
@@ -153,26 +190,8 @@ storyMaker <- function(city){
 }
 ```
 
+Using purrr, we iterate over the unique City names in the cities table and feed it to our storyMaker function. What comes out is 252 local stories, ready for local news organizations to publish as is or do their own reporting by calling the companies and asking them about their loan. But for most very small rural news organizations, getting a spreadsheet from the SBA, filtering to Nebraska and their towns is asking a lot. This puts a story into their hands, for free, that they can use to jump start their own efforts. 
+
 ```{r}
 map(cities$City, ~storyMaker(.))
 ```
-
-
-
-```{r}
-makeStory <- function(cnty){
-  x <- stories %>% filter(County == cnty)
-  headline <- paste(x$Percent, " percent of ", x$County, " County workers have claimed unemployment during pandemic", sep="")
-  filename <- paste("stories/", cnty, ".txt", sep="")
-  writeLines(c(headline,"\n\n", x$story), filename)
-}
-```
-
-
-
-```{r}
-first <-  
-
-
-```
-
