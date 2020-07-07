@@ -129,8 +129,8 @@ cities <- cities %>% mutate(
 ```{r}
 cities <- cities %>% mutate(
   NoDataClause = case_when(
-      Jobs == blanks ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs they expected to preserve.", sep=""), 
-      blanks != Loans ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and they claimed in their loan paperwork they would preserve ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
+      Loans == blanks ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, ". However, the business provided no information about the number of jobs they expected to preserve.", sep=""), 
+      Loans != blanks ~ paste("Of them, ", apstylenumber(Loans), " ", Localclauseverb, " from ", ProperCity, " and the ", Headlineplural, " planned in their loan paperwork to preserve ", apstylenumber(Jobs), " jobs with that money.", " ", Blankclause, sep="")
 )
 )
 ```
