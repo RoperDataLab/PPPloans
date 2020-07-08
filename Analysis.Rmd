@@ -11,6 +11,10 @@ library(tidyverse)
 library(glue)
 ```
 
+```{r}
+
+```
+
 Loading Nebraska data which is cleaned and created in the DataWork notebook in the `data-raw` folder.
 
 ```{r}
@@ -91,36 +95,13 @@ Going to make a lede out of how many loans come from a specific city.
 First need an AP style function for small towns with one, two, three loans instead of 1, 2, 3 loans. 
 
 ```{r}
-apstylenumber <- function(x){
-  if (x == 1) {
-  num <- "one"
-} else if (x == 2) {
-  num <- "two"
-} else if (x == 3) {
-  num <- "three"
-} else if (x == 4) {
-  num <- "four"
-} else if (x == 5) {
-  num <- "five"
-} else if (x == 6) {
-  num <- "six"
-} else if (x == 7) {
-  num <- "seven"
-} else if (x == 8) {
-  num <- "eight"
-} else if (x == 9) {
-  num <- "nine"
-} else {
-  num <- as.character(format(x, nsmall=0, big.mark=","))
-}
-  return(num)
-}
+source("apstylenumber.R")
 ```
 
 Testing it.
 
 ```{r}
-apstylenumber(22)
+apstylenumber(3)
 ```
 
 Now I'm going to create a table that has the bits and pieces I need to make my story. The first chunk here is going to fix the capitalization of city names, group by those cities, create some numbers for those cities, then convert them into AP style.
