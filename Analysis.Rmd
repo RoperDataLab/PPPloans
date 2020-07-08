@@ -2,7 +2,7 @@
 
 This document is impossible to explain in a linear fashion. It is the result of a repetitively iterative process of attempting to write a paragraph with code, then needing new code to generate a new paragraph, and the order of things becomes difficult to explain.
 
-But it's an example of how data journalists write paragraphs of stories out of analysis, combined with an example of how to create locally relevant versions of a story on a wide scale. 
+But it is an example of how data journalists write paragraphs of stories out of analysis, combined with an example of how to create locally relevant versions of a story on a wide scale. 
 
 First we'll load the tidyverse and glue, which is part of the tidyverse, which helps write text with templating. We'll use it and paste where each is advantageous. 
 
