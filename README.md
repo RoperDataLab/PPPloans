@@ -1,6 +1,10 @@
 # PPP loans
 
-An analysis and generated set of stories for Nebraska PPP loans. The stories use data from the Small Business Administration to power local stories for more than 250 cities in Nebraska. The stories were distributed by the Nebraska News Service. A selection of publications where stories ran: 
+An analysis and generated set of stories for Nebraska PPP loans. The stories use data from the Small Business Administration to power local stories for more than 250 cities in Nebraska. The stories were distributed by the Nebraska News Service. 
+
+More on how we did it is [here](https://roperdatalab.github.io/blog/2020/07/07/automating-ppp-stories/).
+
+A selection of publications where stories ran: 
 
 [Albion](https://albionnewsonline.com/2020/07/07/area-businesses-receive-paycheck-protection-loans/)
 [Clearwater](https://www.summerlandadvocate.com/story/2020/07/09/news/nebraska-businesses-receive-pandemic-loans/1104.html)
